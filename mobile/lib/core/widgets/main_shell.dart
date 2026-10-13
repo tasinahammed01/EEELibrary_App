@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../routing/app_routes.dart';
+import '../constants/design_tokens.dart';
 
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.location, required this.child});
@@ -17,6 +18,11 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
     body: child,
     bottomNavigationBar: NavigationBar(
+      indicatorColor: AppColors.blueTint,
+      overlayColor: WidgetStateProperty.resolveWith(
+        (states) =>
+            states.contains(WidgetState.pressed) ? AppColors.blueTint : null,
+      ),
       selectedIndex: _paths.indexOf(location).clamp(0, _paths.length - 1),
       onDestinationSelected: (index) => context.go(_paths[index]),
       destinations: const [

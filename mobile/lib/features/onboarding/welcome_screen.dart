@@ -5,138 +5,115 @@ import '../../core/constants/design_tokens.dart';
 import '../../core/routing/app_routes.dart';
 import '../../core/widgets/brand.dart';
 import '../../core/widgets/page_body.dart';
+import 'widgets/welcome_benefit_grid.dart';
+import 'widgets/welcome_hero.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) => Scaffold(
     body: PageBody(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpace.sm,
+        vertical: AppSpace.xs,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Align(alignment: Alignment.centerLeft, child: Brand()),
-          const SizedBox(height: AppSpace.lg),
-          const _EducationIllustration(),
-          const SizedBox(height: AppSpace.lg),
-          Text(
-            'Your next chapter starts here',
-            style: Theme.of(context).textTheme.labelLarge
-                ?.copyWith(color: AppColors.blue),
-          ),
-          const SizedBox(height: AppSpace.xs),
-          Text(
-            'Buy EEE Books, Notes\n& Job Prep Resources',
-            style: Theme.of(context).textTheme.headlineMedium
-                ?.copyWith(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: AppSpace.sm),
-          Text(
-            'Build a stronger foundation in electrical and electronic engineering. Find resources for your courses, exams, and career?all in one place.',
-            style: Theme.of(context).textTheme.bodyLarge
-                ?.copyWith(color: AppColors.muted, height: 1.5),
-          ),
-          const SizedBox(height: AppSpace.md),
-          LayoutBuilder(
-            builder: (context, constraints) => Wrap(
-              spacing: AppSpace.sm,
-              runSpacing: AppSpace.sm,
-              children: [
-                for (final benefit in const [
-                  (Icons.school_outlined, 'Academic Books'),
-                  (Icons.work_outline, 'Job Preparation'),
-                  (Icons.bolt_rounded, 'Instant Access'),
-                  (Icons.shield_outlined, 'Secure Reading'),
-                ])
-                  SizedBox(
-                    width: (constraints.maxWidth - AppSpace.sm) / 2,
-                    child: _Benefit(icon: benefit.$1, label: benefit.$2),
-                  ),
-              ],
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () => context.push(AppRoutes.login),
+              child: const Text('Sign In'),
             ),
           ),
-          const SizedBox(height: AppSpace.lg),
-          FilledButton(
-            onPressed: () => context.push(AppRoutes.register),
-            child: const Text('Get Started'),
-          ),
+          const Center(child: Brand(prominent: true)),
+          const SizedBox(height: AppSpace.sm),
+          const _WelcomeHeadline(),
           const SizedBox(height: AppSpace.xs),
-          TextButton(
-            onPressed: () => context.push(AppRoutes.login),
-            child: const Text('Sign In'),
-          ),
-          TextButton(
-            onPressed: () => context.go(AppRoutes.home),
-            child: const Text('Browse as Guest'),
-          ),
+          const WelcomeHero(),
+          const SizedBox(height: AppSpace.sm),
+          const WelcomeBenefitGrid(),
+          const SizedBox(height: AppSpace.xs),
+          const _WelcomePageIndicator(),
+          const SizedBox(height: AppSpace.xs),
+          const _WelcomeActions(),
         ],
       ),
     ),
   );
 }
 
-class _Benefit extends StatelessWidget {
-  const _Benefit({required this.icon, required this.label});
-  final IconData icon;
-  final String label;
+class _WelcomeHeadline extends StatelessWidget {
+  const _WelcomeHeadline();
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(AppSpace.sm),
-    decoration: BoxDecoration(
-      color: AppColors.surface,
-      border: Border.all(color: AppColors.outline),
-      borderRadius: BorderRadius.circular(AppRadius.card),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) => Column(
+    children: [
+      Text(
+        'Buy EEE Books, Notes\n& Job Prep Resources',
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+          fontWeight: FontWeight.w800,
+          letterSpacing: -.8,
+          height: 1.08,
+        ),
+      ),
+      const SizedBox(height: AppSpace.xs),
+      Text(
+        'Your one-stop destination for academic books, notes, exam preparation and more.',
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.bodyMedium
+            ?.copyWith(color: AppColors.muted, height: 1.35),
+      ),
+    ],
+  );
+}
+
+class _WelcomePageIndicator extends StatelessWidget {
+  const _WelcomePageIndicator();
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: AppColors.blue),
-        const SizedBox(height: AppSpace.xs),
-        Text(label, style: Theme.of(context).textTheme.labelLarge),
+        for (var index = 0; index < 3; index++)
+          Container(
+            width: AppSpace.xs,
+            height: AppSpace.xs,
+            margin: const EdgeInsets.symmetric(horizontal: AppSpace.xs / 2),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: index == 0 ? AppColors.blue : AppColors.outline,
+            ),
+          ),
       ],
     ),
   );
 }
 
-class _EducationIllustration extends StatelessWidget {
-  const _EducationIllustration();
+class _WelcomeActions extends StatelessWidget {
+  const _WelcomeActions();
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(AppSpace.md),
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [AppColors.blueTint, AppColors.goldTint],
-      ),
-      borderRadius: BorderRadius.circular(AppRadius.card),
-    ),
-    child: Column(
-      children: [
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      FilledButton(
+        onPressed: () => context.push(AppRoutes.register),
+        child: const Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: AppSpace.xs,
           children: [
-            Icon(
-              Icons.lightbulb_outline_rounded,
-              color: AppColors.blue,
-              size: AppSpace.lg,
-            ),
-            Icon(
-              Icons.menu_book_rounded,
-              color: AppColors.navy,
-              size: AppSizes.illustrationIcon,
-            ),
-            Icon(
-              Icons.school_rounded,
-              color: AppColors.blue,
-              size: AppSpace.lg,
-            ),
+            Text('Get Started'),
+            Icon(Icons.arrow_forward_rounded, size: AppSpace.md),
           ],
         ),
-        const SizedBox(height: AppSpace.sm),
-        Text(
-          'A world of knowledge. One library.',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-      ],
-    ),
+      ),
+      TextButton(
+        onPressed: () => context.go(AppRoutes.home),
+        child: const Text('Browse as Guest'),
+      ),
+    ],
   );
 }

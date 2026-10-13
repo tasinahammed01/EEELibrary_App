@@ -30,10 +30,27 @@ abstract final class AppTheme {
         foregroundColor: AppColors.navy,
         centerTitle: false,
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? AppColors.blue
+                : AppColors.muted,
+          ),
+        ),
+      ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(double.infinity, AppSizes.buttonHeight),
           shape: shape,
+          elevation: 2,
+          shadowColor: AppColors.blue.withValues(alpha: .18),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpace.sm,
+            vertical: AppSpace.sm,
+          ),
+          disabledBackgroundColor: AppColors.blueTint,
+          disabledForegroundColor: AppColors.muted,
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
@@ -50,7 +67,25 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: AppColors.background,
+        floatingLabelStyle: const TextStyle(
+          color: AppColors.blue,
+          fontWeight: FontWeight.w600,
+        ),
+        prefixIconColor: AppColors.muted,
+        suffixIconColor: AppColors.muted,
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.control),
+          borderSide: const BorderSide(color: AppColors.blue, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.control),
+          borderSide: BorderSide(color: base.colorScheme.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.control),
+          borderSide: BorderSide(color: base.colorScheme.error, width: 2),
+        ),
         contentPadding: const EdgeInsets.all(AppSpace.sm),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.control),

@@ -10,6 +10,8 @@ abstract final class AppColors {
   static const outline = Color(0xFFD7DDE7);
   static const blueTint = Color(0xFFEBEFFB);
   static const goldTint = Color(0xFFFFF3D9);
+  static const pinkTint = Color(0xFFFCEEF3);
+  static const mintTint = Color(0xFFE8F5EF);
 }
 
 abstract final class AppSpace {
@@ -30,4 +32,5 @@ abstract final class AppSizes {
   static const buttonHeight = 56.0;
   static const contentWidth = 480.0;
   static const illustrationIcon = 72.0;
+  static const welcomeHeroMaxWidth = 360.0;
 }

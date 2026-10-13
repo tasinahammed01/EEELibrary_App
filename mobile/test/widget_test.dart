@@ -57,6 +57,7 @@ void main() {
       (w) => w is TextField && w.obscureText,
     );
     expect(hidden, findsOneWidget);
+    await tester.ensureVisible(find.byTooltip('Show password'));
     await tester.tap(find.byTooltip('Show password'));
     await tester.pump();
     expect(hidden, findsNothing);
