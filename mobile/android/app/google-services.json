@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "583422112045",
+    "project_id": "eee-library",
+    "storage_bucket": "eee-library.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:583422112045:android:dd41b81da4d64e65ab23a4",
+        "android_client_info": {
+          "package_name": "com.eeelibrary.eeelibrary"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "583422112045-c9r8rgb1k627pfdkonoif2f8afde42u6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eeelibrary.eeelibrary",
+            "certificate_hash": "19a63c83f17146c5a369fd6a237a24b66ef9a90e"
+          }
+        },
+        {
+          "client_id": "583422112045-6eqb2vbsq2v36fv6rpu4troj93e0fgik.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtsbymDHX1qhna5-HGZK5TnYfpgb87sns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "583422112045-6eqb2vbsq2v36fv6rpu4troj93e0fgik.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

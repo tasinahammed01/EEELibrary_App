@@ -1,0 +1,59 @@
+{
+  "name": "eeelibrary-backend",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0 <23 || >=24.0.0 <25"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "start:dev": "node --watch -r ts-node/register src/main.ts",
+    "format": "prettier --write src test *.json *.ts *.mjs *.md",
+    "format:check": "prettier --check src test *.json *.ts *.mjs *.md",
+    "lint": "eslint src test prisma.config.ts",
+    "test": "jest --runInBand",
+    "test:integration": "jest --runInBand --config jest.integration.config.json",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.2.7",
+    "@nestjs/config": "4.0.4",
+    "@nestjs/core": "11.2.7",
+    "@nestjs/platform-express": "11.2.7",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0",
+    "firebase-admin": "^14.5.0",
+    "helmet": "^8.1.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "@nestjs/testing": "11.2.7",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.0.0",
+    "@types/supertest": "^6.0.0",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "jest": "^30.0.0",
+    "prettier": "^3.0.0",
+    "prisma": "7.10.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.0.0"
+  },
+  "overrides": {
+    "mysql2": "^3.24.6",
+    "deepmerge-ts": "^8.0.2"
+  }
+}

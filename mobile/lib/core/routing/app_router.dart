@@ -1,3 +1,8 @@
+import '../../features/auth/presentation/auth_controller.dart';
+import '../../features/auth/domain/auth_models.dart';
+import '../../features/auth/verification_screen.dart';
+import '../../features/auth/auth_status_screen.dart';
+
 import 'package:go_router/go_router.dart';
 
 import '../../features/splash/splash_screen.dart';
@@ -15,9 +20,51 @@ import 'app_routes.dart';
 final appRouter = createAppRouter();
 GoRouter createAppRouter({
   String initialLocation = AppRoutes.splash,
+  AuthController? auth,
 }) => GoRouter(
   initialLocation: initialLocation,
+  refreshListenable: auth,
+  redirect: (context, state) {
+    if (auth == null) return null;
+    final location = state.uri.path;
+    if (location == AppRoutes.splash && !auth.splashReady) return null;
+    final target = switch (auth.status) {
+      AuthStatus.initializing => AppRoutes.splash,
+      AuthStatus.verificationRequired => AppRoutes.verification,
+      AuthStatus.error => AppRoutes.authStatus,
+      AuthStatus.authenticated =>
+        {
+              AppRoutes.splash,
+              AppRoutes.welcome,
+              AppRoutes.login,
+              AppRoutes.register,
+              AppRoutes.verification,
+              AppRoutes.authStatus,
+            }.contains(location)
+            ? AppRoutes.home
+            : location,
+      AuthStatus.signedOut =>
+        {
+              AppRoutes.splash,
+              AppRoutes.verification,
+              AppRoutes.authStatus,
+            }.contains(location)
+            ? (auth.message == null ? AppRoutes.welcome : AppRoutes.login)
+            : location == AppRoutes.reader
+            ? AppRoutes.login
+            : location,
+    };
+    return target == location ? null : target;
+  },
   routes: [
+    GoRoute(
+      path: AppRoutes.verification,
+      builder: (_, _) => const VerificationScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.authStatus,
+      builder: (_, _) => const AuthStatusScreen(),
+    ),
     GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashScreen()),
     GoRoute(path: AppRoutes.welcome, builder: (_, _) => const WelcomeScreen()),
     GoRoute(path: AppRoutes.login, builder: (_, _) => const LoginScreen()),

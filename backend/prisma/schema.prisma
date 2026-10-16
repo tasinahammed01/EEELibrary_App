@@ -1,0 +1,273 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DISABLED
+}
+
+enum PublicationStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PaymentMethod {
+  BKASH
+  NAGAD
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAYMENT_SUBMITTED
+  COMPLETED
+  CANCELLED
+}
+
+enum EntitlementStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum DevicePlatform {
+  ANDROID
+  IOS
+  WEB
+  OTHER
+}
+
+enum DeviceStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  CONTENT_MANAGER
+  PAYMENT_REVIEWER
+}
+
+enum AdminStatus {
+  ACTIVE
+  DISABLED
+}
+
+model User {
+  id             String            @id @default(uuid()) @db.Uuid
+  externalAuthId String            @unique @db.VarChar(128)
+  email          String            @unique @db.Citext
+  displayName    String            @db.VarChar(120)
+  status         UserStatus        @default(ACTIVE)
+  createdAt      DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime          @updatedAt @db.Timestamptz(3)
+  orders         Order[]
+  payments       Payment[]
+  entitlements   Entitlement[]
+  devices        Device[]
+  sessions       Session[]
+  progress       ReadingProgress[]
+
+  @@index([status, createdAt])
+}
+
+model Category {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(100)
+  slug        String   @unique @db.VarChar(160)
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+  books       Book[]
+
+  @@index([isActive, sortOrder])
+}
+
+model Book {
+  id               String            @id @default(uuid()) @db.Uuid
+  title            String            @db.VarChar(240)
+  slug             String            @unique @db.VarChar(280)
+  description      String            @db.Text
+  categoryId       String            @db.Uuid
+  category         Category          @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  price            Decimal           @db.Decimal(12, 2)
+  currency         String            @default("BDT") @db.Char(3)
+  status           PublicationStatus @default(DRAFT)
+  pageCount        Int?
+  previewPageCount Int               @default(0)
+  coverObjectKey   String?           @db.VarChar(512)
+  coverAltText     String?           @db.VarChar(240)
+  createdAt        DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime          @updatedAt @db.Timestamptz(3)
+  orders           Order[]
+  entitlements     Entitlement[]
+  progress         ReadingProgress[]
+
+  @@index([categoryId, status, createdAt])
+  @@index([status, createdAt])
+}
+
+// Single-book order with an immutable purchase-price snapshot (future service).
+model Order {
+  id           String        @id @default(uuid()) @db.Uuid
+  userId       String        @db.Uuid
+  user         User          @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  bookId       String        @db.Uuid
+  book         Book          @relation(fields: [bookId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  amount       Decimal       @db.Decimal(12, 2)
+  currency     String        @default("BDT") @db.Char(3)
+  status       OrderStatus   @default(PENDING_PAYMENT)
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
+  payments     Payment[]
+  entitlements Entitlement[]
+
+  // Composite FKs prevent mismatched purchase owners/books.
+  @@unique([id, userId])
+  @@unique([id, userId, bookId])
+  @@index([userId, createdAt])
+  @@index([bookId])
+  @@index([status, createdAt])
+}
+
+// Multiple attempts per order; each transaction reference can be used only once.
+model Payment {
+  id                   String        @id @default(uuid()) @db.Uuid
+  orderId              String        @db.Uuid
+  userId               String        @db.Uuid
+  order                Order         @relation(fields: [orderId, userId], references: [id, userId], onDelete: Restrict, onUpdate: Cascade)
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  method               PaymentMethod
+  transactionReference String        @unique @db.Citext
+  amount               Decimal       @db.Decimal(12, 2)
+  currency             String        @default("BDT") @db.Char(3)
+  status               PaymentStatus @default(PENDING)
+  reviewedById         String?       @db.Uuid
+  reviewedBy           AdminUser?    @relation(fields: [reviewedById], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  reviewedAt           DateTime?     @db.Timestamptz(3)
+  rejectionReason      String?       @db.VarChar(500)
+  createdAt            DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime      @updatedAt @db.Timestamptz(3)
+
+  @@index([orderId, userId])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([reviewedById])
+}
+
+// Authoritative access record. Progress or client-side state never grants access.
+model Entitlement {
+  id        String            @id @default(uuid()) @db.Uuid
+  userId    String            @db.Uuid
+  user      User              @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  bookId    String            @db.Uuid
+  book      Book              @relation(fields: [bookId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  orderId   String            @unique @db.Uuid
+  order     Order             @relation(fields: [orderId, userId, bookId], references: [id, userId, bookId], onDelete: Restrict, onUpdate: Cascade)
+  status    EntitlementStatus @default(REVOKED)
+  revokedAt DateTime?         @db.Timestamptz(3)
+  createdAt DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime          @updatedAt @db.Timestamptz(3)
+
+  @@unique([userId, bookId])
+  @@index([userId, status, createdAt])
+  @@index([bookId])
+}
+
+model Device {
+  id               String         @id @default(uuid()) @db.Uuid
+  userId           String         @db.Uuid
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  deviceIdentifier String         @db.VarChar(256)
+  name             String?        @db.VarChar(120)
+  platform         DevicePlatform
+  status           DeviceStatus   @default(ACTIVE)
+  lastSeenAt       DateTime?      @db.Timestamptz(3)
+  createdAt        DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime       @updatedAt @db.Timestamptz(3)
+  sessions         Session[]
+
+  @@unique([userId, deviceIdentifier])
+  @@unique([id, userId])
+  @@index([userId, status, lastSeenAt])
+}
+
+model Session {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  deviceId  String    @db.Uuid
+  device    Device    @relation(fields: [deviceId, userId], references: [id, userId], onDelete: Cascade, onUpdate: Cascade)
+  // SHA-256 digest only; never a plaintext access/refresh token.
+  tokenHash String    @unique @db.Char(64)
+  expiresAt DateTime  @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([deviceId, userId])
+  @@index([userId, revokedAt, expiresAt])
+  @@index([expiresAt])
+}
+
+model ReadingProgress {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  bookId    String   @db.Uuid
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  lastPage  Int      @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([userId, bookId])
+  @@index([userId, updatedAt])
+  @@index([bookId])
+}
+
+model AdminUser {
+  id             String      @id @default(uuid()) @db.Uuid
+  externalAuthId String      @unique @db.VarChar(128)
+  email          String      @unique @db.Citext
+  displayName    String      @db.VarChar(120)
+  role           AdminRole
+  status         AdminStatus @default(ACTIVE)
+  createdAt      DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime    @updatedAt @db.Timestamptz(3)
+  payments       Payment[]
+  auditLogs      AuditLog[]
+
+  @@index([status, role])
+}
+
+// Append-only events: no updatedAt because historical events are immutable.
+model AuditLog {
+  id           String    @id @default(uuid()) @db.Uuid
+  adminActorId String    @db.Uuid
+  adminActor   AdminUser @relation(fields: [adminActorId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  action       String    @db.VarChar(100)
+  targetType   String    @db.VarChar(100)
+  targetId     String    @db.Uuid
+  // Structured, allowlisted, nonsecret event details only. No credentials/tokens.
+  metadata     Json?
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@index([adminActorId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@index([action, createdAt])
+}

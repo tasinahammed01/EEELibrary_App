@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+src/generated/
+.env
+.env.*
+!.env.example
+*.log
+*.tsbuildinfo
+
+.credentials/
+*firebase-adminsdk*.json
+*service-account*.json
+application_default_credentials.json

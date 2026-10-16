@@ -1,0 +1,8 @@
+{
+  "testEnvironment": "node",
+  "testMatch": ["<rootDir>/test/**/*.spec.ts"],
+  "testPathIgnorePatterns": ["\\.integration\\.spec\\.ts$"],
+  "transform": { "^.+\\.tsx?$": ["ts-jest", { "tsconfig": "tsconfig.json" }] },
+  "setupFiles": ["<rootDir>/test/setup.ts"],
+  "clearMocks": true
+}

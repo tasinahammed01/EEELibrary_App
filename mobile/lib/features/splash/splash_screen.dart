@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../auth/presentation/auth_scope.dart';
 import '../../core/constants/design_tokens.dart';
 import '../../core/routing/app_routes.dart';
 
@@ -18,7 +19,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _timer = Timer(const Duration(seconds: 2), () {
-      if (mounted) context.go(AppRoutes.welcome);
+      if (mounted) {
+        AuthScope.read(context)?.completeSplash();
+        context.go(AppRoutes.welcome);
+      }
     });
   }
 

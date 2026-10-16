@@ -1,17 +1,24 @@
-# eeelibrary
+﻿# EEELibrary mobile
 
-A new Flutter project.
+Material 3 Flutter application, with feature-first screens and go_router navigation.
 
-## Getting Started
+Phase 2B Android authentication uses the official Firebase client SDKs and the existing backend. See [authentication setup, architecture and manual QA](docs/auth-integration.md) and [validation report](docs/phase-2b-validation.md).
 
-This project is a starting point for a Flutter application.
+```powershell
+flutter pub get
+flutter run -d emulator-5554 --no-enable-impeller
+```
 
-A few resources to get you started if this is your first Flutter project:
+Debug backend URL defaults to the Android emulator host, `http://10.0.2.2:3000`. Override it using `--dart-define=BACKEND_BASE_URL=...`. Profile/release requires a trusted HTTPS URL. The Impeller workaround applies only to this local emulator invocation.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Android Firebase client configuration is in `android/app/google-services.json`. Never place Firebase Admin credentials in this app. Non-Android Firebase setup, production signing/deployment, payments, paid access and PDF authorization remain outside the implemented phase.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Validation:
+
+```powershell
+dart format .
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --debug
+```

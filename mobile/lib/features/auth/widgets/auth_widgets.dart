@@ -7,6 +7,8 @@ import '../../../core/widgets/brand.dart';
 import '../../../core/widgets/page_body.dart';
 import 'auth_hero.dart';
 
+export 'auth_feedback.dart';
+
 class AuthLayout extends StatelessWidget {
   const AuthLayout({
     super.key,
@@ -15,7 +17,9 @@ class AuthLayout extends StatelessWidget {
     required this.artwork,
     required this.form,
     required this.accountSwitch,
+    this.busy = false,
   });
+  final bool busy;
   final String title;
   final String subtitle;
   final AuthArtwork artwork;
@@ -23,68 +27,73 @@ class AuthLayout extends StatelessWidget {
   final Widget accountSwitch;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    resizeToAvoidBottomInset: true,
-    appBar: AppBar(
-      toolbarHeight: AppSizes.touchTarget,
-      automaticallyImplyLeading: false,
-      leading: IconButton(
-        tooltip: 'Back',
-        onPressed: () {
-          if (context.canPop()) {
-            context.pop();
-          } else {
-            context.go(AppRoutes.welcome);
-          }
-        },
-        icon: const Icon(Icons.arrow_back_rounded),
+  Widget build(BuildContext context) => PopScope(
+    canPop: !busy,
+    child: Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        toolbarHeight: AppSizes.touchTarget,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          tooltip: 'Back',
+          onPressed: busy
+              ? null
+              : () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go(AppRoutes.welcome);
+                  }
+                },
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
       ),
-    ),
-    body: PageBody(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpace.sm,
-        vertical: AppSpace.xs,
-      ),
-      child: AutofillGroup(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Center(child: Brand(prominent: true)),
-            const SizedBox(height: AppSpace.sm),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                letterSpacing: -.8,
-                height: 1.12,
+      body: PageBody(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpace.sm,
+          vertical: AppSpace.xs,
+        ),
+        child: AutofillGroup(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Center(child: Brand(prominent: true)),
+              const SizedBox(height: AppSpace.sm),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -.8,
+                  height: 1.12,
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpace.xs),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium
-                  ?.copyWith(color: AppColors.muted, height: 1.4),
-            ),
-            const SizedBox(height: AppSpace.xs),
-            AuthHero(artwork: artwork),
-            const SizedBox(height: AppSpace.sm),
-            Material(
-              color: AppColors.surface,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(color: AppColors.outline),
-                borderRadius: BorderRadius.circular(AppRadius.card),
+              const SizedBox(height: AppSpace.xs),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: AppColors.muted, height: 1.4),
               ),
-              clipBehavior: Clip.antiAlias,
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpace.sm),
-                child: form,
+              const SizedBox(height: AppSpace.xs),
+              AuthHero(artwork: artwork),
+              const SizedBox(height: AppSpace.sm),
+              Material(
+                color: AppColors.surface,
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(color: AppColors.outline),
+                  borderRadius: BorderRadius.circular(AppRadius.card),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpace.sm),
+                  child: form,
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpace.sm),
-            accountSwitch,
-          ],
+              const SizedBox(height: AppSpace.sm),
+              accountSwitch,
+            ],
+          ),
         ),
       ),
     ),
@@ -102,8 +111,10 @@ class PasswordField extends StatefulWidget {
     this.helperText,
     this.textInputAction = TextInputAction.next,
     this.fieldKey,
+    this.enabled = true,
   });
   final String label;
+  final bool enabled;
   final bool isNewPassword;
   final TextEditingController? controller;
   final FormFieldValidator<String>? validator;
@@ -128,6 +139,7 @@ class _PasswordFieldState extends State<PasswordField> {
   @override
   Widget build(BuildContext context) => TextFormField(
     key: widget.fieldKey,
+    enabled: widget.enabled,
     controller: widget.controller,
     validator: widget.validator,
     onChanged: widget.onChanged,
@@ -159,7 +171,9 @@ class _PasswordFieldState extends State<PasswordField> {
           minHeight: AppSizes.touchTarget,
         ),
         tooltip: '${_obscure ? 'Show' : 'Hide'} ${widget.label.toLowerCase()}',
-        onPressed: () => setState(() => _obscure = !_obscure),
+        onPressed: widget.enabled
+            ? () => setState(() => _obscure = !_obscure)
+            : null,
         icon: Icon(
           _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
         ),
@@ -188,8 +202,9 @@ class AuthDivider extends StatelessWidget {
 }
 
 class GoogleAuthButton extends StatelessWidget {
-  const GoogleAuthButton({super.key, required this.label});
+  const GoogleAuthButton({super.key, required this.label, this.onPressed});
   final String label;
+  final VoidCallback? onPressed;
   @override
   Widget build(BuildContext context) => OutlinedButton(
     style: OutlinedButton.styleFrom(
@@ -201,8 +216,7 @@ class GoogleAuthButton extends StatelessWidget {
         vertical: AppSpace.sm,
       ),
     ),
-    // TODO: Connect Google authentication when auth integration is ready.
-    onPressed: null,
+    onPressed: onPressed,
     child: Wrap(
       alignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
@@ -230,17 +244,37 @@ class GoogleAuthButton extends StatelessWidget {
 }
 
 class AuthSubmitButton extends StatelessWidget {
-  const AuthSubmitButton({super.key, required this.label});
+  const AuthSubmitButton({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.busy = false,
+  });
   final String label;
+  final VoidCallback? onPressed;
+  final bool busy;
   @override
   Widget build(BuildContext context) => FilledButton(
-    // TODO: Connect real auth; valid fields must never imply authentication.
-    onPressed: null,
+    onPressed: busy ? null : onPressed,
     child: Wrap(
       alignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: AppSpace.xs,
-      children: [Text(label), const Icon(Icons.arrow_forward_rounded)],
+      children: [
+        Text(label),
+        if (busy)
+          const SizedBox(
+            width: AppSpace.md,
+            height: AppSpace.md,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              semanticsLabel: 'Authentication in progress',
+              color: AppColors.blue,
+            ),
+          )
+        else
+          const Icon(Icons.arrow_forward_rounded),
+      ],
     ),
   );
 }
@@ -254,7 +288,7 @@ class AuthAccountSwitch extends StatelessWidget {
   });
   final String prompt;
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   @override
   Widget build(BuildContext context) => Material(
     color: AppColors.blueTint,

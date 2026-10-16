@@ -1,0 +1,19 @@
+# Backend and local infrastructure secrets/output
+/backend/node_modules/
+/backend/dist/
+/backend/coverage/
+/backend/src/generated/
+**/.env
+**/.env.*
+!**/.env.example
+*.log
+*.tsbuildinfo
+*.tmp
+.tmp/
+coverage/
+
+# Firebase/ADC private credential files
+/backend/.credentials/
+**/*firebase-adminsdk*.json
+**/*service-account*.json
+**/application_default_credentials.json

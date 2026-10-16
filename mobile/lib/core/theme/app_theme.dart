@@ -21,6 +21,15 @@ abstract final class AppTheme {
     );
     return base.copyWith(
       scaffoldBackgroundColor: AppColors.background,
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.navy,
+        contentTextStyle: base.textTheme.bodyMedium?.copyWith(
+          color: AppColors.surface,
+        ),
+        actionTextColor: AppColors.gold,
+        shape: shape,
+      ),
       textTheme: base.textTheme.apply(
         bodyColor: AppColors.navy,
         displayColor: AppColors.navy,
