@@ -30,6 +30,24 @@ class AuthController extends ChangeNotifier {
   bool _sessionExpired = false;
   AuthStatus get status => _status;
   ApplicationUser? get user => _user;
+  // Read-only bridge for protected feature clients; identity changes invalidate
+  // both token acquisition and in-flight responses without exposing credentials.
+  String? get protectedSessionKey =>
+      !_disposed &&
+          _status == AuthStatus.authenticated &&
+          _sessionUid == _gateway.currentUser?.uid
+      ? _user?.id
+      : null;
+  Future<String> protectedIdToken({bool forceRefresh = false}) async {
+    final key = protectedSessionKey;
+    if (key == null) throw const AuthFailure(AuthFailureKind.unauthorized);
+    final token = await _gateway.token(forceRefresh: forceRefresh);
+    if (protectedSessionKey != key) {
+      throw const AuthFailure(AuthFailureKind.unauthorized);
+    }
+    return token;
+  }
+
   bool get busy => _busy;
   bool get splashReady => _splashReady;
   bool get canResend => _resendReady && !_busy;

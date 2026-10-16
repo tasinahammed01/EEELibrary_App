@@ -11,5 +11,8 @@ abstract final class AppRoutes {
   static const authStatus = '/auth-status';
   static const bookDetails = '/books/:slug';
   static String bookPath(String slug) => '/books/${Uri.encodeComponent(slug)}';
+  static const orders = '/orders';
+  static const order = '/orders/:id';
+  static String orderPath(String id) => '/orders/${Uri.encodeComponent(id)}';
   static const reader = '/reader';
 }

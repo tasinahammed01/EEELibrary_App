@@ -139,6 +139,7 @@ class FakeTransport implements ApiTransport {
     required String method,
     required Uri uri,
     required Map<String, String> headers,
+    Map<String, dynamic>? body,
   }) async {
     requests.add(RecordedRequest(method, uri, headers));
     if (wait != null) return wait!.future;

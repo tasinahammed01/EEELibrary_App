@@ -28,6 +28,7 @@ class ProbeTransport implements ApiTransport {
     required String method,
     required Uri uri,
     required Map<String, String> headers,
+    Map<String, dynamic>? body,
   }) async {
     if (fail) throw StateError('private transport detail');
     expect(method, 'GET');
@@ -439,7 +440,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Free'), findsOneWidget);
     expect(find.byType(CatalogCover), findsOneWidget);
-    await reveal(tester, find.textContaining('Catalog preview only'));
+    await reveal(tester, find.text('Sign in to get this book'));
     expect(find.text('Read now'), findsNothing);
   });
   testWidgets('Book details generic failures never show raw exceptions', (
@@ -508,7 +509,7 @@ void main() {
           await reveal(
             tester,
             details
-                ? find.textContaining('Catalog preview only')
+                ? find.text('Sign in to get this book')
                 : find.byKey(const ValueKey('catalog-book-study-guide-3')),
           );
           expect(tester.takeException(), isNull);

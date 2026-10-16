@@ -97,9 +97,15 @@ class CatalogCover extends StatelessWidget {
 }
 
 class CatalogBookCard extends StatelessWidget {
-  const CatalogBookCard({super.key, required this.book, required this.onTap});
+  const CatalogBookCard({
+    super.key,
+    required this.book,
+    required this.onTap,
+    this.inLibrary = false,
+  });
   final CatalogBook book;
   final VoidCallback onTap;
+  final bool inLibrary;
   @override
   Widget build(BuildContext context) => Material(
     color: Theme.of(context).colorScheme.surface,
@@ -131,7 +137,7 @@ class CatalogBookCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSpace.xs),
             Text(
-              book.priceLabel,
+              inLibrary ? 'In Library' : book.priceLabel,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w800,
@@ -150,9 +156,11 @@ class CatalogBookSliver extends StatelessWidget {
     super.key,
     required this.books,
     required this.onBook,
+    this.inLibrary = false,
   });
   final List<CatalogBook> books;
   final ValueChanged<CatalogBook> onBook;
+  final bool inLibrary;
   @override
   Widget build(BuildContext context) => SliverLayoutBuilder(
     builder: (context, constraints) {
@@ -177,6 +185,7 @@ class CatalogBookSliver extends StatelessWidget {
                             'catalog-book-${books[row * columns + column].slug}',
                           ),
                           book: books[row * columns + column],
+                          inLibrary: inLibrary,
                           onTap: () => onBook(books[row * columns + column]),
                         )
                       : const SizedBox.shrink(),

@@ -5,6 +5,9 @@ const outsideDirectory = (path: string): boolean =>
   path === '..' || path.startsWith('..' + sep) || isAbsolute(path);
 
 export interface Environment {
+  MANUAL_PAYMENT_DEVELOPMENT_MODE: boolean;
+  MANUAL_PAYMENT_BKASH_INSTRUCTIONS: string | undefined;
+  MANUAL_PAYMENT_NAGAD_INSTRUCTIONS: string | undefined;
   NODE_ENV: 'development' | 'test' | 'production';
   PORT: number;
   DATABASE_URL: string;
@@ -145,7 +148,37 @@ export function validateEnvironment(
       errors.add('GOOGLE_APPLICATION_CREDENTIALS');
     }
   }
+  const paymentInstructions = (key: string): string | undefined => {
+    const value = input[key];
+    if (value === undefined || value === '') return undefined;
+    if (
+      typeof value !== 'string' ||
+      value.trim().length === 0 ||
+      value.length > 400 ||
+      [...value].some((character) => character.charCodeAt(0) < 32)
+    ) {
+      errors.add(key);
+      return undefined;
+    }
+    return value.trim();
+  };
+  const developmentPayments = input.MANUAL_PAYMENT_DEVELOPMENT_MODE;
+  if (
+    developmentPayments !== undefined &&
+    (typeof developmentPayments !== 'string' ||
+      !['', 'false', 'true'].includes(developmentPayments))
+  )
+    errors.add('MANUAL_PAYMENT_DEVELOPMENT_MODE');
+  if (developmentPayments === 'true' && mode !== 'development')
+    errors.add('MANUAL_PAYMENT_DEVELOPMENT_MODE');
   const result: Environment = {
+    MANUAL_PAYMENT_DEVELOPMENT_MODE: developmentPayments === 'true',
+    MANUAL_PAYMENT_BKASH_INSTRUCTIONS: paymentInstructions(
+      'MANUAL_PAYMENT_BKASH_INSTRUCTIONS',
+    ),
+    MANUAL_PAYMENT_NAGAD_INSTRUCTIONS: paymentInstructions(
+      'MANUAL_PAYMENT_NAGAD_INSTRUCTIONS',
+    ),
     FIREBASE_PROJECT_ID: projectId,
     GOOGLE_APPLICATION_CREDENTIALS: credentialPath,
     NODE_ENV: mode as Environment['NODE_ENV'],

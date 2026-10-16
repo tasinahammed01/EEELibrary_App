@@ -23,3 +23,8 @@ Object.assign(process.env, {
   REDIS_PORT: '6380',
   CORS_ORIGINS: 'http://localhost:5173',
 });
+
+// Prevent local receiving instructions/development mode from entering unit tests.
+process.env.MANUAL_PAYMENT_DEVELOPMENT_MODE = '';
+process.env.MANUAL_PAYMENT_BKASH_INSTRUCTIONS = '';
+process.env.MANUAL_PAYMENT_NAGAD_INSTRUCTIONS = '';

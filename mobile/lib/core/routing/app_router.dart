@@ -1,3 +1,5 @@
+import '../../features/purchases/data/purchase_repository.dart';
+import '../../features/purchases/presentation/order_screen.dart';
 import '../../features/catalog/book_details_screen.dart';
 import '../../features/catalog/data/catalog_repository.dart';
 import '../../features/auth/presentation/auth_controller.dart';
@@ -24,6 +26,7 @@ GoRouter createAppRouter({
   String initialLocation = AppRoutes.splash,
   AuthController? auth,
   CatalogRepository? catalog,
+  PurchaseRepository? purchases,
 }) => GoRouter(
   initialLocation: initialLocation,
   refreshListenable: auth,
@@ -53,7 +56,9 @@ GoRouter createAppRouter({
               AppRoutes.authStatus,
             }.contains(location)
             ? (auth.message == null ? AppRoutes.welcome : AppRoutes.login)
-            : location == AppRoutes.reader
+            : (location == AppRoutes.reader ||
+                  location == AppRoutes.orders ||
+                  location.startsWith('${AppRoutes.orders}/'))
             ? AppRoutes.login
             : location,
     };
@@ -61,10 +66,20 @@ GoRouter createAppRouter({
   },
   routes: [
     GoRoute(
+      path: AppRoutes.orders,
+      builder: (_, _) => OrdersScreen(repository: purchases),
+    ),
+    GoRoute(
+      path: AppRoutes.order,
+      builder: (_, state) =>
+          OrderScreen(id: state.pathParameters['id']!, repository: purchases),
+    ),
+    GoRoute(
       path: AppRoutes.bookDetails,
       builder: (_, state) => BookDetailsScreen(
         slug: state.pathParameters['slug']!,
         repository: catalog,
+        purchases: purchases,
       ),
     ),
     GoRoute(
@@ -99,7 +114,7 @@ GoRouter createAppRouter({
         ),
         GoRoute(
           path: AppRoutes.library,
-          builder: (_, _) => const LibraryScreen(),
+          builder: (_, _) => LibraryScreen(repository: purchases),
         ),
         GoRoute(
           path: AppRoutes.profile,

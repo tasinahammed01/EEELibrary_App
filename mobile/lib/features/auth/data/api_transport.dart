@@ -14,6 +14,7 @@ abstract interface class ApiTransport {
     required String method,
     required Uri uri,
     required Map<String, String> headers,
+    Map<String, dynamic>? body,
   });
   void close();
 }
@@ -27,6 +28,7 @@ class IoApiTransport implements ApiTransport {
     required String method,
     required Uri uri,
     required Map<String, String> headers,
+    Map<String, dynamic>? body,
   }) async {
     HttpClientRequest? active;
     Future<ApiResponse> execute() async {
@@ -35,7 +37,12 @@ class IoApiTransport implements ApiTransport {
       request.followRedirects =
           false; // Never forward bearer credentials to another location.
       headers.forEach(request.headers.set);
-      if (method == 'POST') {
+      if (body != null) {
+        final payload = utf8.encode(jsonEncode(body));
+        request.headers.contentType = ContentType.json;
+        request.contentLength = payload.length;
+        request.add(payload);
+      } else if (method == 'POST') {
         request.contentLength = 0; // No identity or password body.
       }
       final response = await request.close();

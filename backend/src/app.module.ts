@@ -1,3 +1,4 @@
+import { PurchaseModule } from './purchases/purchase.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -16,6 +17,7 @@ import { HealthModule } from './health/health.module';
     PrismaModule,
     HealthModule,
     AuthModule,
+    PurchaseModule,
     CatalogModule,
   ],
 })

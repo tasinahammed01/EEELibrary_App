@@ -1,3 +1,6 @@
+import '../purchases/data/purchase_repository.dart';
+import '../purchases/presentation/book_purchase_panel.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -10,8 +13,14 @@ import 'presentation/catalog_controller.dart';
 import 'widgets/catalog_widgets.dart';
 
 class BookDetailsScreen extends StatefulWidget {
-  const BookDetailsScreen({super.key, required this.slug, this.repository});
+  const BookDetailsScreen({
+    super.key,
+    required this.slug,
+    this.repository,
+    this.purchases,
+  });
   final String slug;
+  final PurchaseRepository? purchases;
   final CatalogRepository? repository;
   @override
   State<BookDetailsScreen> createState() => _BookDetailsScreenState();
@@ -117,8 +126,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                     const SizedBox(height: AppSpace.xs),
                     Text(book.description),
                     const SizedBox(height: AppSpace.md),
-                    const CatalogNotice(
-                      message: 'Catalog preview only. Purchasing and reading are not available yet.',
+                    BookPurchasePanel(
+                      slug: book.slug,
+                      free: double.parse(book.price) == 0,
+                      repository: widget.purchases,
                     ),
                   ],
                 ),

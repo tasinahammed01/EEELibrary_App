@@ -1,3 +1,5 @@
+import '../features/purchases/data/purchase_repository.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -20,12 +22,15 @@ class EEELibraryApp extends StatefulWidget {
 class _EEELibraryAppState extends State<EEELibraryApp>
     with WidgetsBindingObserver {
   late final GoRouter _router;
+  late final PurchaseRepository? _purchases = widget.auth == null
+      ? null
+      : PurchaseApi(widget.auth!);
   final _messenger = GlobalKey<ScaffoldMessengerState>();
   bool _expiryAnnounced = false;
   @override
   void initState() {
     super.initState();
-    _router = createAppRouter(auth: widget.auth);
+    _router = createAppRouter(auth: widget.auth, purchases: _purchases);
     WidgetsBinding.instance.addObserver(this);
     widget.auth?.addListener(_authChanged);
     widget.auth?.start();
@@ -82,6 +87,7 @@ class _EEELibraryAppState extends State<EEELibraryApp>
     WidgetsBinding.instance.removeObserver(this);
     widget.auth?.removeListener(_authChanged);
     _router.dispose();
+    _purchases?.close();
     widget.auth?.dispose();
     super.dispose();
   }
