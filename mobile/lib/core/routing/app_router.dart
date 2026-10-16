@@ -1,3 +1,5 @@
+import '../../features/catalog/book_details_screen.dart';
+import '../../features/catalog/data/catalog_repository.dart';
 import '../../features/auth/presentation/auth_controller.dart';
 import '../../features/auth/domain/auth_models.dart';
 import '../../features/auth/verification_screen.dart';
@@ -21,6 +23,7 @@ final appRouter = createAppRouter();
 GoRouter createAppRouter({
   String initialLocation = AppRoutes.splash,
   AuthController? auth,
+  CatalogRepository? catalog,
 }) => GoRouter(
   initialLocation: initialLocation,
   refreshListenable: auth,
@@ -58,6 +61,13 @@ GoRouter createAppRouter({
   },
   routes: [
     GoRoute(
+      path: AppRoutes.bookDetails,
+      builder: (_, state) => BookDetailsScreen(
+        slug: state.pathParameters['slug']!,
+        repository: catalog,
+      ),
+    ),
+    GoRoute(
       path: AppRoutes.verification,
       builder: (_, _) => const VerificationScreen(),
     ),
@@ -76,10 +86,16 @@ GoRouter createAppRouter({
       builder: (context, state, child) =>
           MainShell(location: state.uri.path, child: child),
       routes: [
-        GoRoute(path: AppRoutes.home, builder: (_, _) => const HomeScreen()),
+        GoRoute(
+          path: AppRoutes.home,
+          builder: (_, _) => HomeScreen(repository: catalog),
+        ),
         GoRoute(
           path: AppRoutes.explore,
-          builder: (_, _) => const ExploreScreen(),
+          builder: (_, state) => ExploreScreen(
+            repository: catalog,
+            initialCategory: state.uri.queryParameters['category'],
+          ),
         ),
         GoRoute(
           path: AppRoutes.library,

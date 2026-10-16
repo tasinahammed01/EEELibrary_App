@@ -21,22 +21,28 @@ class HomeSearchBar extends StatelessWidget {
     child: Row(
       children: [
         Expanded(
-          child: InkWell(
+          child: Semantics(
+            button: true,
+            label: 'Search books and resources',
             onTap: onSearch,
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpace.sm),
-              child: Row(
-                children: [
-                  const Icon(Icons.search_rounded, color: AppColors.blue),
-                  const SizedBox(width: AppSpace.xs),
-                  Expanded(
-                    child: Text(
-                      'Search books, notes, MCQ, jobs...',
-                      style: Theme.of(context).textTheme.bodyMedium
-                          ?.copyWith(color: AppColors.muted),
+            excludeSemantics: true,
+            child: InkWell(
+              onTap: onSearch,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpace.sm),
+                child: Row(
+                  children: [
+                    const Icon(Icons.search_rounded, color: AppColors.blue),
+                    const SizedBox(width: AppSpace.xs),
+                    Expanded(
+                      child: Text(
+                        'Search books, notes, MCQ, jobs...',
+                        style: Theme.of(context).textTheme.bodyMedium
+                            ?.copyWith(color: AppColors.muted),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

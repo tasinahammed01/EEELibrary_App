@@ -22,5 +22,6 @@ class ApiConfig {
     ),
   );
   final Uri baseUrl;
+  Uri catalogEndpoint(String path) => baseUrl.resolve('/api/v1/$path');
   Uri authEndpoint(String action) => baseUrl.resolve('/api/v1/auth/$action');
 }

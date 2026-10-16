@@ -17,36 +17,44 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     body: child,
-    bottomNavigationBar: NavigationBar(
-      indicatorColor: AppColors.blueTint,
-      overlayColor: WidgetStateProperty.resolveWith(
-        (states) =>
-            states.contains(WidgetState.pressed) ? AppColors.blueTint : null,
+    bottomNavigationBar: DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.outline)),
       ),
-      selectedIndex: _paths.indexOf(location).clamp(0, _paths.length - 1),
-      onDestinationSelected: (index) => context.go(_paths[index]),
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home),
-          label: 'Home',
+      child: NavigationBar(
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: AppColors.surface,
+        elevation: 0,
+        indicatorColor: AppColors.blueTint,
+        overlayColor: WidgetStateProperty.resolveWith(
+          (states) =>
+              states.contains(WidgetState.pressed) ? AppColors.blueTint : null,
         ),
-        NavigationDestination(
-          icon: Icon(Icons.explore_outlined),
-          selectedIcon: Icon(Icons.explore),
-          label: 'Explore',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.bookmarks_outlined),
-          selectedIcon: Icon(Icons.bookmarks),
-          label: 'Library',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.person_outline),
-          selectedIcon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
+        selectedIndex: _paths.indexOf(location).clamp(0, _paths.length - 1),
+        onDestinationSelected: (index) => context.go(_paths[index]),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.explore_outlined),
+            selectedIcon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bookmarks_outlined),
+            selectedIcon: Icon(Icons.bookmarks),
+            label: 'Library',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
     ),
   );
 }

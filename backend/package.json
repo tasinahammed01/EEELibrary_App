@@ -16,7 +16,8 @@
     "test:integration": "jest --runInBand --config jest.integration.config.json",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:deploy": "prisma migrate deploy"
+    "prisma:deploy": "prisma migrate deploy",
+    "seed:development": "ts-node src/catalog/seed-development.ts"
   },
   "dependencies": {
     "@nestjs/common": "11.2.7",

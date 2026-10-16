@@ -9,5 +9,7 @@ abstract final class AppRoutes {
   static const profile = '/profile';
   static const verification = '/verify-email';
   static const authStatus = '/auth-status';
+  static const bookDetails = '/books/:slug';
+  static String bookPath(String slug) => '/books/${Uri.encodeComponent(slug)}';
   static const reader = '/reader';
 }

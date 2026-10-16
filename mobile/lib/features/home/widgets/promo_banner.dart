@@ -5,6 +5,7 @@ import '../../../core/constants/design_tokens.dart';
 class PromoBanner extends StatelessWidget {
   const PromoBanner({super.key, required this.onExplore});
   final VoidCallback onExplore;
+
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(AppSpace.md),
@@ -16,89 +17,139 @@ class PromoBanner extends StatelessWidget {
       ),
       borderRadius: BorderRadius.circular(AppRadius.card),
     ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Wrap(
-          spacing: AppSpace.sm,
-          runSpacing: AppSpace.xs,
-          crossAxisAlignment: WrapCrossAlignment.center,
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final copy = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _OfferBadge(),
-            ExcludeSemantics(
-              child: Icon(
-                Icons.auto_stories_rounded,
+            Text(
+              'YOUR NEXT CHAPTER',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: AppColors.gold,
-                size: AppSpace.xl,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
               ),
             ),
-            ExcludeSemantics(
-              child: Icon(
-                Icons.electric_bolt_outlined,
-                color: AppColors.gold,
-                size: AppSpace.md,
+            const SizedBox(height: AppSpace.xs),
+            Text(
+              'Build your EEE bookshelf',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: AppColors.surface,
+                fontWeight: FontWeight.w800,
+                height: 1.15,
+              ),
+            ),
+            const SizedBox(height: AppSpace.xs),
+            Text(
+              'Big ideas. Clearer concepts.\nResources for your next step.',
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: AppColors.surface, height: 1.5),
+            ),
+          ],
+        );
+        final showArt =
+            constraints.maxWidth >= AppSizes.contentWidth / 2 &&
+            MediaQuery.textScalerOf(context).scale(1) <= 1.3;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (showArt)
+              Row(
+                children: [
+                  Expanded(child: copy),
+                  const SizedBox(width: AppSpace.sm),
+                  const _BookArtwork(),
+                ],
+              )
+            else
+              copy,
+            const SizedBox(height: AppSpace.sm),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(
+                  AppSizes.touchTarget,
+                  AppSizes.touchTarget,
+                ),
+                backgroundColor: AppColors.gold,
+                foregroundColor: AppColors.navy,
+                elevation: 0,
+              ),
+              onPressed: onExplore,
+              child: const Wrap(
+                spacing: AppSpace.xs,
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text('Explore Now'),
+                  Icon(Icons.arrow_forward_rounded),
+                ],
               ),
             ),
           ],
-        ),
-        const SizedBox(height: AppSpace.sm),
-        Text(
-          'Get Up to 50% OFF',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            color: AppColors.surface,
-            fontWeight: FontWeight.w800,
-            height: 1.2,
-          ),
-        ),
-        const SizedBox(height: AppSpace.xs),
-        Text(
-          'on EEE Books & Notes',
-          style: Theme.of(context).textTheme.titleMedium
-              ?.copyWith(color: AppColors.surface),
-        ),
-        const SizedBox(height: AppSpace.sm),
-        Text(
-          'Academic • Job Preparation • Exam Resources',
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(color: AppColors.surface, height: 1.5),
-        ),
-        const SizedBox(height: AppSpace.md),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.gold,
-            foregroundColor: AppColors.navy,
-          ),
-          onPressed: onExplore,
-          child: const Wrap(
-            spacing: AppSpace.xs,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [Text('Explore Now'), Icon(Icons.arrow_forward_rounded)],
-          ),
-        ),
-      ],
+        );
+      },
     ),
   );
 }
 
-class _OfferBadge extends StatelessWidget {
-  const _OfferBadge();
+class _BookArtwork extends StatelessWidget {
+  const _BookArtwork();
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(
-      horizontal: AppSpace.xs,
-      vertical: AppSpace.xs,
-    ),
-    decoration: BoxDecoration(
-      color: AppColors.surface.withValues(alpha: .12),
-      borderRadius: BorderRadius.circular(AppRadius.control),
-    ),
-    child: Text(
-      'SPECIAL OFFER',
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-        color: AppColors.gold,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1,
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: SizedBox(
+      width: AppSpace.xl * 2,
+      height: AppSpace.xl * 3,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Transform.rotate(
+            angle: -.14,
+            child: Container(
+              width: AppSpace.xl + AppSpace.lg,
+              height: AppSpace.xl * 2 + AppSpace.sm,
+              decoration: BoxDecoration(
+                color: AppColors.gold,
+                borderRadius: BorderRadius.circular(AppRadius.control),
+              ),
+            ),
+          ),
+          Transform.rotate(
+            angle: .10,
+            child: Container(
+              width: AppSpace.xl + AppSpace.lg,
+              height: AppSpace.xl * 2 + AppSpace.sm,
+              padding: const EdgeInsets.all(AppSpace.sm),
+              decoration: BoxDecoration(
+                color: AppColors.blueTint,
+                borderRadius: BorderRadius.circular(AppRadius.control),
+                border: const Border(
+                  left: BorderSide(
+                    color: AppColors.surface,
+                    width: AppSpace.xs,
+                  ),
+                ),
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.bolt_rounded,
+                    color: AppColors.blue,
+                    size: AppSpace.lg,
+                  ),
+                  Spacer(),
+                  Icon(Icons.graphic_eq, color: AppColors.blue),
+                  SizedBox(height: AppSpace.xs),
+                  Divider(color: AppColors.blue),
+                ],
+              ),
+            ),
+          ),
+          const Align(
+            alignment: Alignment.topRight,
+            child: Icon(Icons.auto_awesome, color: AppColors.gold),
+          ),
+        ],
       ),
     ),
   );
