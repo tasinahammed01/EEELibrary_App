@@ -1,3 +1,4 @@
+import { AdminModule } from './admin/admin.module';
 import { PurchaseModule } from './purchases/purchase.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { Module } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { HealthModule } from './health/health.module';
     AuthModule,
     PurchaseModule,
     CatalogModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

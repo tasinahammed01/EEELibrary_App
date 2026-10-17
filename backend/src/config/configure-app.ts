@@ -28,6 +28,14 @@ export function configureApp(app: INestApplication): void {
       next();
     });
   }
+  app.use((request: Request, response: Response, next: NextFunction) => {
+    if (
+      request.path === '/api/v1/admin' ||
+      request.path.startsWith('/api/v1/admin/')
+    )
+      response.setHeader('Cache-Control', 'no-store');
+    next();
+  });
   app.use(helmet());
   app.use(json({ limit: '16kb' }));
   app.use(urlencoded({ limit: '16kb', extended: false }));
